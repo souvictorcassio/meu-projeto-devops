@@ -1,0 +1,56 @@
+{
+  "family": "my-app-task",
+  "networkMode": "awsvpc
+  "executionRoleArn": "arn:aws:iam::750311440214:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "mongo",
+      "image": "mongo",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 27017,
+          "hostPort": 27017,
+          "protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "image": "750311440214.dkr.ecr.us-east-1.amazonaws.com/backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "mongo",
+          "condition": "START"
+        }
+      ]
+    },
+    {
+      "name": "frontend",
+      "image": "750311440214.dkr.ecr.us-east-1.amazonaws.com/frontend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "backend",
+          "condition": "START"
+        }
+      ]
+    }
+  ]
+}
